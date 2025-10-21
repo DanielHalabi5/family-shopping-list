@@ -1,5 +1,6 @@
-export type apiAuthType = {
-  email: string,
-  password: string,
-  name?: string | null,
-}
+export type User = {
+  id: string;
+  email: string;
+  name: string;
+};
+
