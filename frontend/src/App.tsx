@@ -3,7 +3,7 @@ import { useState, type FormEvent } from 'react';
 import AuthPage from './components/AuthPage'
 import useAuthStore from './stores/authStore';
 import { createFamily, login, signup } from './api';
-import type { Family, User } from './types';
+import type { User } from './types';
 import { HomePage } from './components/HomePage';
 import useFamilyStore from './stores/familyStore';
 
@@ -71,7 +71,7 @@ const App = () => {
     }
   }
 
-  async function handleFamilyCreate(familyData: Family) {
+  async function handleFamilyCreate(familyData: { familyName: string }) {
     try {
       setErrorMsg('');
       setSuccessMsg('');
@@ -110,7 +110,7 @@ const App = () => {
 
   return (
     //  main app component when logged in
-    <HomePage handleFamilyCreate={handleFamilyCreate}  />
+    <HomePage handleFamilyCreate={handleFamilyCreate} />
   )
 }
 
