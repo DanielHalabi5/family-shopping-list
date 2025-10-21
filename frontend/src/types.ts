@@ -3,5 +3,13 @@ export type User = {
   email: string;
   name: string;
   password?: string;
+  familyId?: string;
 };
 
+
+export type Family = {
+  id: string;
+  name: string;
+  ownerId: string;
+  members: string[];
+};

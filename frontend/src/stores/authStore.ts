@@ -1,25 +1,18 @@
 import { create } from 'zustand';
-
-export type userType = {
-    id: number,
-    name: string,
-    email: string,
-    password: string,
-    familyId: number
-}
+import type { User } from '../types';
 
 
 export type authType = {
     token: string | null,
-    user: userType | null,
-    setAuth: (token: string, user: userType) => void,
+    user: User | null,
+    setAuth: (token: string, user: User) => void,
     clearAuth: () => void
 }
 
 const useAuthStore = create<authType>((set) => ({
 
     token: localStorage.getItem('token'),
-    user: JSON.parse(localStorage.getItem('user') || 'null'),
+    user: JSON.parse(localStorage.getItem('user') || ''),
     setAuth: (token, user) => {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));

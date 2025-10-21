@@ -3,7 +3,7 @@ import { FaShoppingCart } from 'react-icons/fa'
 
 type Props = {
     handleLogin: (e: FormEvent<HTMLFormElement>) => void,
-    handleSignup: (e: FormEvent<HTMLFormElement>) => void,
+    handleSignup: (e: FormEvent<HTMLFormElement>) => void
 }
 
 const AuthPage = ({ handleLogin, handleSignup, }: Props) => {

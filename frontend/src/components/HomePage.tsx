@@ -1,19 +1,25 @@
 import { useState } from 'react';
 import { FaPlus, FaUserFriends, FaUserPlus } from 'react-icons/fa';
-import type {  User } from '../types';
+import type { User } from '../types';
 
 
 type HomePageProps = {
   user: User;
-
+  handleFamilyCreate: (data: { name: string }) => void | Promise<void>;
+  onFamilyJoined: (familyId: number) => void;
 };
 
-export function HomePage({ user }: HomePageProps) {
+export function HomePage({ user, handleFamilyCreate }: HomePageProps) {
   const [activeTab, setActiveTab] = useState<'create' | 'join'>('create');
   const [familyName, setFamilyName] = useState('');
   const [familyCode, setFamilyCode] = useState('');
 
- 
+  const submitFamily = async () => {
+    if (!familyName) return alert('Title required');
+    handleFamilyCreate({ name: familyName });
+    setFamilyName('');
+  };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
@@ -25,44 +31,42 @@ export function HomePage({ user }: HomePageProps) {
           <h2 className="mb-2">Welcome, {user.name}!</h2>
           <p className="text-gray-600">Create a new family or join an existing one</p>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow-lg border border-gray-200">
           <div className="p-6 border-b border-gray-200">
             <h2 className="mb-1">Get Started</h2>
             <p className="text-gray-600">Choose an option below to begin managing your family shopping list</p>
           </div>
-          
+
           <div className="p-6">
             <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-lg">
               <button
                 onClick={() => setActiveTab('create')}
-                className={`flex-1 py-2 px-4 rounded-md transition-all flex items-center justify-center gap-2 ${
-                  activeTab === 'create'
-                    ? 'bg-white shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
+                className={`flex-1 py-2 px-4 rounded-md transition-all flex items-center justify-center gap-2 ${activeTab === 'create'
+                  ? 'bg-white shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+                  }`}
               >
                 <FaPlus className="w-4 h-4" />
                 Create Family
               </button>
               <button
                 onClick={() => setActiveTab('join')}
-                className={`flex-1 py-2 px-4 rounded-md transition-all flex items-center justify-center gap-2 ${
-                  activeTab === 'join'
-                    ? 'bg-white shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
+                className={`flex-1 py-2 px-4 rounded-md transition-all flex items-center justify-center gap-2 ${activeTab === 'join'
+                  ? 'bg-white shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+                  }`}
               >
                 <FaUserPlus className="w-4 h-4" />
                 Join Family
               </button>
             </div>
-            
+
             {activeTab === 'create' && (
               <div className="space-y-4">
-                <form 
-
-                className="space-y-4">
+                <form
+                  onSubmit={submitFamily}
+                  className="space-y-4">
                   <div className="space-y-2">
                     <label htmlFor="family-name" className="block">
                       Family Name
@@ -80,7 +84,7 @@ export function HomePage({ user }: HomePageProps) {
                       Choose a name for your family group
                     </p>
                   </div>
-                  
+
                   <button
                     type="submit"
                     className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
@@ -89,7 +93,7 @@ export function HomePage({ user }: HomePageProps) {
                     Create Family
                   </button>
                 </form>
-                
+
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-sm text-blue-900">
                     As the creator, you'll be the admin and can approve join requests from other family members.
@@ -97,12 +101,12 @@ export function HomePage({ user }: HomePageProps) {
                 </div>
               </div>
             )}
-            
+
             {activeTab === 'join' && (
               <div className="space-y-4">
-                <form 
+                <form
 
-                className="space-y-4">
+                  className="space-y-4">
                   <div className="space-y-2">
                     <label htmlFor="family-code" className="block">
                       Family Code
@@ -120,7 +124,7 @@ export function HomePage({ user }: HomePageProps) {
                       Ask your family admin for the family code
                     </p>
                   </div>
-                  
+
                   <button
                     type="submit"
                     className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
@@ -129,7 +133,7 @@ export function HomePage({ user }: HomePageProps) {
                     Request to Join
                   </button>
                 </form>
-                
+
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                   <p className="text-sm text-amber-900">
                     Your request will be sent to the family admin for approval.
