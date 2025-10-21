@@ -1,0 +1,55 @@
+# User stories
+As a {role}, I want to be able to do {feature}
+As a user:
+I want to be able to register
+I want to be able to login
+I want to be able to create a Shopping Item to shop on saturday
+I want to be able to delete a item
+I want to be able to update a item
+
+Due Date is saturday
+Title
+Description
+
+# Pages
+Login / Sign In Or Register
+Join an existing family / Create your own
+Family dashboard
+Overview
+Members
+shopping list page
+
+
+Filters
+	All, Skipped, Included
+Sorting:
+	By weeks
+
+Components
+	Header
+	App logo
+	Nav
+	
+	Signed In?
+	Status
+	Dashboard
+	Shopping list
+	Member Card
+
+# API / Backend
+ShoppingController
+Create
+Read
+Update
+Delete
+
+UserController
+Register
+Login
+Update
+
+FamilyController
+Create
+Join
+List members
+Kick member
