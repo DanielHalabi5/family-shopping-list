@@ -6,10 +6,10 @@ import type { User } from '../types';
 type HomePageProps = {
   user: User;
   handleFamilyCreate: (data: { name: string }) => void | Promise<void>;
-  onFamilyJoined: (familyId: number) => void;
+  handleJoin: (familyId: string) => void | Promise<void>;
 };
 
-export function HomePage({ user, handleFamilyCreate }: HomePageProps) {
+export function HomePage({ user, handleFamilyCreate, handleJoin }: HomePageProps) {
   const [activeTab, setActiveTab] = useState<'create' | 'join'>('create');
   const [familyName, setFamilyName] = useState('');
   const [familyCode, setFamilyCode] = useState('');
@@ -105,7 +105,7 @@ export function HomePage({ user, handleFamilyCreate }: HomePageProps) {
             {activeTab === 'join' && (
               <div className="space-y-4">
                 <form
-
+                  onSubmit={handleJoin(familyCode)}
                   className="space-y-4">
                   <div className="space-y-2">
                     <label htmlFor="family-code" className="block">

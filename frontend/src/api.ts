@@ -35,3 +35,7 @@ export async function createFamily(token: string, name: string) {
 }
 
 
+export async function createJoinRequest(token: string, userId: number, familyId: number) {
+  const res = await axios.post(`${API_URL}/request`, { userId, familyId: Number(familyId) }, { headers: authHeader(token) });
+  return res.data;
+}

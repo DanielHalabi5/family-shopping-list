@@ -13,3 +13,11 @@ export type Family = {
   ownerId: string;
   members: string[];
 };
+
+export type JoinRequest = {
+  id: string;
+  userId: string;
+  userName: string;
+  familyId: string;
+  status: 'pending' | 'approved' | 'rejected';
+};

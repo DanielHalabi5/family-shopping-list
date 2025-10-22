@@ -6,12 +6,14 @@ import { createFamily, login, signup } from './api';
 import type { User } from './types';
 import { HomePage } from './components/HomePage';
 import useFamilyStore from './stores/familyStore';
+import useJoinRequestStore from './stores/joinRequestStore';
 
 
 
 const App = () => {
   const { token, user, setAuth, clearAuth } = useAuthStore();
   const { families, fetchFamilies, addFamily } = useFamilyStore();
+  const { requests, sendJoinRequest } = useJoinRequestStore();
 
 
 
@@ -98,7 +100,23 @@ const App = () => {
     }
   }
 
+  async function handleJoin(familyId: string) {
+    try {
+      setErrorMsg('');
+      setSuccessMsg('');
 
+      await sendJoinRequest(token, user.id, familyId);
+      setSuccessMsg("The Join Request Was Successfully Sent")
+      setTimeout(() => {
+        setSuccessMsg('');
+      }, 5000);
+    } catch (err) {
+      setErrorMsg('Request Was Already Sent');
+      setTimeout(() => {
+        setErrorMsg('');
+      }, 5000);
+    }
+  };
 
 
   if (!token) {
@@ -110,7 +128,7 @@ const App = () => {
 
   return (
     //  main app component when logged in
-    <HomePage handleFamilyCreate={handleFamilyCreate} />
+    <HomePage user={user} handleFamilyCreate={handleFamilyCreate} handleJoin={handleJoin} />
   )
 }
 
