@@ -58,7 +58,7 @@ model ShoppingList {
 model ShoppingItem {
   id          String        @id @default(cuid())
   name        String
-  description String?
+  quantity String?
   status      ItemStatus    @default(INCLUDED)
 
   familyId    String
