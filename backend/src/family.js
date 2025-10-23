@@ -26,18 +26,31 @@ router.post('/create', async (req, res) => {
       data: { name, ownerId: userId },
     });
 
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: { familyId: family.id },
+      select: { id: true, name: true, email: true, familyId: true },
     });
 
-    const token = sign({ familyId: family.id }, JWT_SECRET, {
-      expiresIn: '7d',
-    });
+    const token = sign(
+      {
+        userId: updatedUser.id,
+        email: updatedUser.email,
+        familyId: family.id,
+      },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
 
     res.json({
       token,
-      family: { id: family.id, name: family.name, ownerId: userId },
+      user: updatedUser,
+      family: {
+        id: family.id,
+        name: family.name,
+        ownerId: userId,
+        members: [userId],
+      },
     });
   } catch (error) {
     console.error('Full error:', error);
@@ -47,14 +60,22 @@ router.post('/create', async (req, res) => {
 
 router.get('/', auth, async (req, res) => {
   try {
-    const familyMembers = await prisma.user.findMany({
-      where: {
-        familyId: req.user.familyId,
+    const family = await prisma.family.findUnique({
+      where: { id: req.user.familyId },
+      include: {
+        members: {
+          select: { id: true, name: true, email: true },
+        },
       },
-      select: { id: true, name: true },
     });
-    res.json(familyMembers);
+
+    if (!family) {
+      return res.json([]);
+    }
+
+    res.json([family]);
   } catch (err) {
+    console.error('Fetch family error:', err);
     res.status(500).json({ error: 'Server error', details: err.message });
   }
 });
@@ -97,7 +118,6 @@ router.get('/details', auth, async (req, res) => {
   }
 });
 
-
 router.delete('/member/:memberId', auth, async (req, res) => {
   const memberId = parseInt(req.params.memberId);
   const ownerId = req.user.id;
@@ -116,7 +136,6 @@ router.delete('/member/:memberId', auth, async (req, res) => {
     if (memberId === ownerId) {
       return res.status(400).json({ error: 'Cannot kick yourself' });
     }
-
 
     await prisma.user.update({
       where: { id: memberId },

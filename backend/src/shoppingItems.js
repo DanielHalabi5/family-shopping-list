@@ -46,9 +46,9 @@ router.post('/', async (req, res) => {
   }
 });
 
-
+// Get all items for a specific list
 router.get('/list/:listId', async (req, res) => {
-  const listId = req.params.id;
+  const listId = req.params.listId;
 
   try {
     const shoppingItems = await prisma.shoppingItem.findMany({
@@ -71,7 +71,7 @@ router.get('/list/:listId', async (req, res) => {
   }
 });
 
-
+// Get a single item by ID
 router.get('/:id', async (req, res) => {
   const id = req.params.id;
 
@@ -102,7 +102,7 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const id = req.params.id;
-  const { name, quantity, status } = req.body;
+  const { name, quantity, status, purchased } = req.body;
 
   try {
     const shoppingItem = await prisma.shoppingItem.findUnique({
@@ -113,12 +113,17 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Not found' });
     }
 
+    let finalStatus = status;
+    if (purchased !== undefined) {
+      finalStatus = purchased ? 'PURCHASED' : 'INCLUDED';
+    }
+
     const updated = await prisma.shoppingItem.update({
       where: { id },
       data: {
         ...(name && { name }),
         ...(quantity !== undefined && { quantity }),
-        ...(status && { status }),
+        ...(finalStatus && { status: finalStatus }),
       },
       include: {
         owner: {
@@ -134,7 +139,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-
+// Delete an item
 router.delete('/:id', async (req, res) => {
   const id = req.params.id;
 
@@ -147,9 +152,6 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Not found' });
     }
 
-    if (shoppingItem.ownerId !== req.user.id) {
-      return res.status(403).json({ error: 'Not authorized' });
-    }
 
     await prisma.shoppingItem.delete({ where: { id } });
     res.json({ success: true });

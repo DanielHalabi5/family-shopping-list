@@ -3,15 +3,14 @@ export type User = {
   email: string;
   name: string;
   password?: string;
-  familyId?: string;
+  familyId?: string | null;
 };
-
 
 export type Family = {
   id: string;
   name: string;
   ownerId: string;
-  members: string[];
+  members?: string[];
 };
 
 export type JoinRequest = {
@@ -27,13 +26,18 @@ export type List = {
   familyId: string;
   start: string;
   end: string;
-  items: ShoppingItem[];
+  items?: ShoppingItem[];
 };
 
 export type ShoppingItem = {
   id: string;
   name: string;
-  quantity: number;
+  quantity: string;
   purchased: boolean;
+  status?: 'INCLUDED' | 'PURCHASED';
   listId: string;
-}
+  owner?: {
+    id: string;
+    name: string;
+  };
+};

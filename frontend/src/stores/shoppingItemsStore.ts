@@ -1,22 +1,27 @@
 import { create } from 'zustand';
-import { deleteShoppingItem, fetchShoppingItems, updateShoppingItem } from '../api';
+import { createShoppingItem, deleteShoppingItem, fetchShoppingItems, updateShoppingItem } from '../api';
 import type { ShoppingItem } from '../types';
 
 type ShoppingItemStoreType = {
     items: ShoppingItem[];
     setItems: (items: ShoppingItem[]) => void;
     fetchItems: (token: string, listId: string) => Promise<void>;
+    createItem: (token: string, newItem: { name: string; quantity: number; purchased: boolean; listId: string; }) => Promise<void>;
     updateItem: (token: string, id: string, updates: { name?: string; quantity?: number; purchased?: boolean; }) => Promise<void>;
     deleteItem: (token: string, id: string) => Promise<void>;
 }
 
 
-const useListStore = create<ShoppingItemStoreType>((set) => ({
+const useItemsStore = create<ShoppingItemStoreType>((set) => ({
     items: [],
     setItems: (items) => set({ items }),
     fetchItems: async (token, listId) => {
         const data = await fetchShoppingItems(token, listId);
         set({ items: data });
+    },
+    createItem: async (token, newItem) => {
+        const data = await createShoppingItem(token, newItem);
+        set((state) => ({ items: [...state.items, data] }));
     },
     updateItem: async (token, id, updates) => {
         const data = await updateShoppingItem(token, id, updates);
@@ -28,4 +33,4 @@ const useListStore = create<ShoppingItemStoreType>((set) => ({
     }
 }));
 
-export default useListStore;
+export default useItemsStore;

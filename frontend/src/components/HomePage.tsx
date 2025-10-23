@@ -8,6 +8,7 @@ type HomePageProps = {
   user: User;
   handleFamilyCreate: (data: { name: string }) => void | Promise<void>;
   handleJoin: (familyId: string) => void | Promise<void>;
+  clearAuth: () => void;
 };
 
 export function HomePage({ user, handleFamilyCreate, handleJoin, clearAuth }: HomePageProps) {

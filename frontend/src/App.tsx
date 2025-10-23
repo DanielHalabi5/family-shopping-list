@@ -1,121 +1,114 @@
-
-import { useEffect, useState, type FormEvent } from 'react';
-import AuthPage from './components/AuthPage'
+import { useEffect, useState } from 'react';
+import AuthPage from './components/AuthPage';
 import useAuthStore from './stores/authStore';
 import { createFamily, login, signup } from './api';
-import type { User } from './types';
 import { HomePage } from './components/HomePage';
 import useFamilyStore from './stores/familyStore';
 import useJoinRequestStore from './stores/joinRequestStore';
-import { BiLogOutCircle } from 'react-icons/bi';
 import useListStore from './stores/ListStore';
 import Dashboard from './components/Dashboard';
-
-
+import useItemsStore from './stores/shoppingItemsStore';
+import { Header } from './components/Header';
 
 const App = () => {
   const { token, user, setAuth, clearAuth } = useAuthStore();
   const { families, fetchFamilies, addFamily } = useFamilyStore();
-  const { requests, sendJoinRequest } = useJoinRequestStore();
-  const { currentList, lists, fetchLists, fetchCurrentList } = useListStore();
-
-
+  const { sendJoinRequest } = useJoinRequestStore();
+  const { currentList, fetchLists, fetchCurrentList } = useListStore();
+  const { createItem, updateItem, deleteItem } = useItemsStore();
 
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-
+  const [currentPage, setCurrentPage] = useState<'auth' | 'home' | 'dashboard' | 'join-requests' | 'previous-lists'>('auth');
 
   useEffect(() => {
     if (token) {
       fetchFamilies(token);
+      if (user?.familyId) {
+        fetchCurrentList(token);
+      }
     }
-  }, [token, fetchFamilies]);
+  }, [token, user?.familyId, fetchFamilies, fetchCurrentList]);
 
-
-  async function handleLogin(creds: User) {
+  async function handleLogin(creds: { email: string; password: string }) {
     try {
       const res = await login(creds);
-      setSuccessMsg('');
+      setErrorMsg('');
       setAuth(res.token, res.user);
-      setSuccessMsg("Your Account was logged in Successfully!")
+      setSuccessMsg("Your Account was logged in Successfully!");
       setTimeout(() => {
         setSuccessMsg('');
       }, 5000);
-    } catch (err: unkown) {
-      if (err.response && err.response.data && err.response.data.error) {
+    } catch (err: any) {
+      if (err.response?.data?.error) {
         setErrorMsg(err.response.data.error);
-        setTimeout(() => {
-          setErrorMsg('');
-        }, 5000);
       } else {
         setErrorMsg('Something went wrong.');
-        setTimeout(() => {
-          setErrorMsg('');
-        }, 5000);
       }
+      setTimeout(() => {
+        setErrorMsg('');
+      }, 5000);
     }
   }
 
-  async function handleSignup(creds: User) {
-
+  async function handleSignup(creds: { email: string; password: string; name: string }) {
     try {
       setErrorMsg('');
       setSuccessMsg('');
       const res = await signup(creds);
       setAuth(res.token, res.user);
-      setSuccessMsg("Your Account was created Successfully!")
+      setSuccessMsg("Your Account was created Successfully!");
       setTimeout(() => {
         setSuccessMsg('');
       }, 5000);
-    } catch (err: unkown) {
-      if (err.response && err.response.data && err.response.data.error) {
+    } catch (err: any) {
+      if (err.response?.data?.error) {
         setErrorMsg(err.response.data.error);
-        setTimeout(() => {
-          setErrorMsg('');
-        }, 5000);
       } else {
         setErrorMsg('Something went wrong.');
-        setTimeout(() => {
-          setErrorMsg('');
-        }, 5000);
       }
+      setTimeout(() => {
+        setErrorMsg('');
+      }, 5000);
     }
   }
 
-  async function handleFamilyCreate(familyData: { name: string }) {
-    try {
-      setErrorMsg('');
-      setSuccessMsg('');
-      const n = await createFamily(token, { ...familyData, userId: user.id });
-      addFamily(n.family);
-      const updatedUser = { ...user, familyId: n.family.id };
-      setAuth(token, updatedUser);
-      setSuccessMsg("The Family Group was Created Successfully!")
-      setTimeout(() => {
-        setSuccessMsg('');
-      }, 5000);
-    } catch (err: unkown) {
-      if (err.response && err.response.data && err.response.data.error) {
-        setErrorMsg(err.response.data.error);
-        setTimeout(() => {
-          setErrorMsg('');
-        }, 5000);
-      } else {
-        setErrorMsg('Something went wrong.');
-        setTimeout(() => {
-          setErrorMsg('');
-        }, 5000);
-      }
+async function handleFamilyCreate(familyData: { name: string }) {
+  try {
+    setErrorMsg('');
+    setSuccessMsg('');
+    const response = await createFamily(token!, { ...familyData, userId: user!.id });
+
+    addFamily(response.family);
+
+    if (response.token && response.user) {
+      setAuth(response.token, response.user);
+    } else {
+      const updatedUser = { ...user!, familyId: response.family.id };
+      setAuth(token!, updatedUser);
     }
+    setSuccessMsg("The Family Group was Created Successfully!");
+    setTimeout(() => {
+      setSuccessMsg('');
+    }, 5000);
+  } catch (err: any) {
+    if (err.response?.data?.error) {
+      setErrorMsg(err.response.data.error);
+    } else {
+      setErrorMsg('Something went wrong.');
+    }
+    setTimeout(() => {
+      setErrorMsg('');
+    }, 5000);
   }
+}
 
   async function handleJoin(familyId: string) {
     try {
       setErrorMsg('');
       setSuccessMsg('');
-
-      await sendJoinRequest(token, user.id, familyId);
-      setSuccessMsg("The Join Request Was Successfully Sent")
+      await sendJoinRequest(token!, user!.id, familyId);
+      setSuccessMsg("The Join Request Was Successfully Sent");
       setTimeout(() => {
         setSuccessMsg('');
       }, 5000);
@@ -125,13 +118,13 @@ const App = () => {
         setErrorMsg('');
       }, 5000);
     }
-  };
+  }
 
   async function getLists() {
     try {
-      await fetchLists(token);
+      await fetchLists(token!);
       setErrorMsg('');
-      setSuccessMsg("Lists Fetched Successfully!")
+      setSuccessMsg("Lists Fetched Successfully!");
       setTimeout(() => {
         setSuccessMsg('');
       }, 5000);
@@ -146,9 +139,8 @@ const App = () => {
 
   async function getCurrentList() {
     try {
-      await fetchCurrentList(token);
+      await fetchCurrentList(token!);
       setErrorMsg('');
-      setSuccessMsg("Current List Fetched Successfully!")
     } catch (err) {
       console.error("Failed to fetch current list", err);
       setErrorMsg('Failed to fetch current list');
@@ -158,22 +150,121 @@ const App = () => {
     }
   }
 
-  if (!token) {
-    return <AuthPage
-      handleLogin={handleLogin}
-      handleSignup={handleSignup}
-    />
+  async function handleCreate(taskData: { name: string; quantity: string; listId: string }) {
+    try {
+      await createItem(token!, taskData);
+      await getCurrentList();
+    } catch (err) {
+      console.error("Failed to create item", err);
+      setErrorMsg('Failed to create item');
+    }
   }
 
-  if (user.familyId === null || user.familyId === undefined) {
-    return <HomePage user={user} handleFamilyCreate={handleFamilyCreate} handleJoin={handleJoin} clearAuth={clearAuth} />
-  } else {
+  async function handleUpdate(id: string, data: { purchased?: boolean; status?: string }) {
+    try {
+      await updateItem(token!, id, data);
+      await getCurrentList();
+    } catch (err) {
+      console.error("Failed to update item", err);
+      setErrorMsg('Failed to update item');
+    }
+  }
+
+  async function handleDelete(id: string) {
+    try {
+      await deleteItem(token!, id);
+      await getCurrentList();
+    } catch (err) {
+      console.error("Failed to delete item", err);
+      setErrorMsg('Failed to delete item');
+    }
+  }
+
+  if (!token || !user) {
     return (
       <>
-        <Dashboard user={user} getLists={getLists} lists={lists} currentList={currentList} getCurrentList={getCurrentList} />
+        {errorMsg && (
+          <div className="fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50">
+            {errorMsg}
+          </div>
+        )}
+        {successMsg && (
+          <div className="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50">
+            {successMsg}
+          </div>
+        )}
+        <AuthPage handleLogin={handleLogin} handleSignup={handleSignup} />
       </>
-    )
+    );
   }
-}
 
-export default App
+  const userFamily = user.familyId
+    ? families.find(fam => fam.id === user.familyId)
+    : null;
+
+  const isAdmin = userFamily ? userFamily.ownerId === user.id : false;
+  console.log('🔍 Admin Check:', {
+    'User ID': user.id,
+    'User Family ID': user.familyId,
+    'Total Families': families.length,
+    'User Family Found': !!userFamily,
+    'Owner ID': userFamily?.ownerId,
+    'Is Admin': isAdmin
+  });
+
+  if (!user.familyId) {
+    return (
+      <>
+        {errorMsg && (
+          <div className="fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50">
+            {errorMsg}
+          </div>
+        )}
+        {successMsg && (
+          <div className="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50">
+            {successMsg}
+          </div>
+        )}
+        <HomePage
+          user={user}
+          handleFamilyCreate={handleFamilyCreate}
+          handleJoin={handleJoin}
+          clearAuth={clearAuth}
+        />
+      </>
+    );
+  }
+
+  return (
+    <>
+      {errorMsg && (
+        <div className="fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50">
+          {errorMsg}
+        </div>
+      )}
+      {successMsg && (
+        <div className="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50">
+          {successMsg}
+        </div>
+      )}
+      <Header
+        user={user}
+        isAdmin={!!isAdmin}
+        clearAuth={clearAuth}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
+      <Dashboard
+        user={user}
+        families={families}
+        currentList={currentList}
+        handleCreate={handleCreate}
+        handleUpdate={handleUpdate}
+        handleDelete={handleDelete}
+        getCurrentList={getCurrentList}
+      />
+    </>
+  );
+};
+
+export default App;
