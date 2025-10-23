@@ -39,3 +39,14 @@ export async function createJoinRequest(token: string, userId: string, familyId:
   const res = await axios.post(`${API_URL}/request`, { userId, familyId }, { headers: authHeader(token) });
   return res.data;
 }
+
+
+export async function fetchCurrentList(token: string) {
+  const res = await axios.get(`${API_URL}/shoppingList/current`, { headers: authHeader(token) });
+  return res.data;
+}
+
+export async function fetchAllLists(token: string) {
+  const res = await axios.get(`${API_URL}/shoppingList/all`, { headers: authHeader(token) });
+  return res.data;
+}

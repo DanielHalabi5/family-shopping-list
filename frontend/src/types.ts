@@ -21,3 +21,11 @@ export type JoinRequest = {
   familyId: string;
   status: 'pending' | 'approved' | 'rejected';
 };
+
+export type List = {
+  id: string;
+  familyId: string;
+  start: string;
+  end: string;
+  // items: ShoppingItem[];
+};
