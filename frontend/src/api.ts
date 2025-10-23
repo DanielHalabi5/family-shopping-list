@@ -50,3 +50,24 @@ export async function fetchAllLists(token: string) {
   const res = await axios.get(`${API_URL}/shoppingList/all`, { headers: authHeader(token) });
   return res.data;
 }
+
+
+export async function createShoppingItem(token: string, name: string, quantity: number, listId: string) {
+  const res = await axios.post(`${API_URL}/shoppingItem`, { name, quantity, listId }, { headers: authHeader(token) });
+  return res.data;
+}
+
+export async function updateShoppingItem(token: string, id: string, updates: { name?: string; quantity?: number; purchased?: boolean; }) {
+  const res = await axios.put(`${API_URL}/shoppingItem/${id}`, updates, { headers: authHeader(token) });
+  return res.data;
+}
+
+export async function deleteShoppingItem(token: string, id: string) {
+  const res = await axios.delete(`${API_URL}/shoppingItem/${id}`, { headers: authHeader(token) });
+  return res.data;
+}
+
+export async function fetchShoppingItems(token: string, listId: string) {
+  const res = await axios.get(`${API_URL}/shoppingItem/list/${listId}`, { headers: authHeader(token) });
+  return res.data;
+}

@@ -27,5 +27,13 @@ export type List = {
   familyId: string;
   start: string;
   end: string;
-  // items: ShoppingItem[];
+  items: ShoppingItem[];
 };
+
+export type ShoppingItem = {
+  id: string;
+  name: string;
+  quantity: number;
+  purchased: boolean;
+  listId: string;
+}

@@ -9,6 +9,7 @@ import useFamilyStore from './stores/familyStore';
 import useJoinRequestStore from './stores/joinRequestStore';
 import { BiLogOutCircle } from 'react-icons/bi';
 import useListStore from './stores/ListStore';
+import Dashboard from './components/Dashboard';
 
 
 

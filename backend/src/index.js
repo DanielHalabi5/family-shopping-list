@@ -5,6 +5,7 @@ import authRoutes from './auth.js';
 import familyRoutes from './family.js';
 import requestRoutes from './request.js';
 import ListRoutes from './shoppingList.js';
+import ItemsRoutes from './shoppingItems.js';
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/family', familyRoutes);
 app.use('/api/request', requestRoutes);
 app.use('/api/shoppingList', ListRoutes);
+app.use('/api/shoppingItems', ItemsRoutes);
+
 
 app.get('/', (req, res) => res.json({ ok: true }));
 
