@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FaPlus, FaUserFriends, FaUserPlus } from 'react-icons/fa';
 import type { User } from '../types';
+import { BiLogOutCircle } from 'react-icons/bi';
 
 
 type HomePageProps = {
@@ -9,7 +10,7 @@ type HomePageProps = {
   handleJoin: (familyId: string) => void | Promise<void>;
 };
 
-export function HomePage({ user, handleFamilyCreate, handleJoin }: HomePageProps) {
+export function HomePage({ user, handleFamilyCreate, handleJoin, clearAuth }: HomePageProps) {
   const [activeTab, setActiveTab] = useState<'create' | 'join'>('create');
   const [familyName, setFamilyName] = useState('');
   const [familyCode, setFamilyCode] = useState('');
@@ -22,7 +23,17 @@ export function HomePage({ user, handleFamilyCreate, handleJoin }: HomePageProps
 
 
   return (
+
+
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+
+      <button
+        onClick={() => { clearAuth(); console.log("done") }}
+        className="px-4 py-2 rounded-full bg-[var(--secondary)] hover:bg-[var(--secondary-hover)] text-white font-medium transition-all"
+      >
+        <BiLogOutCircle />
+
+      </button>
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-full mb-4">
@@ -65,7 +76,7 @@ export function HomePage({ user, handleFamilyCreate, handleJoin }: HomePageProps
             {activeTab === 'create' && (
               <div className="space-y-4">
                 <form
-                  onSubmit={submitFamily}
+                  onSubmit={(e) => { e.preventDefault(); submitFamily(); }}
                   className="space-y-4">
                   <div className="space-y-2">
                     <label htmlFor="family-name" className="block">
@@ -105,7 +116,7 @@ export function HomePage({ user, handleFamilyCreate, handleJoin }: HomePageProps
             {activeTab === 'join' && (
               <div className="space-y-4">
                 <form
-                  onSubmit={handleJoin(familyCode)}
+                  onSubmit={(e) => { e.preventDefault(); handleJoin(familyCode); }}
                   className="space-y-4">
                   <div className="space-y-2">
                     <label htmlFor="family-code" className="block">

@@ -1,5 +1,5 @@
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import AuthPage from './components/AuthPage'
 import useAuthStore from './stores/authStore';
 import { createFamily, login, signup } from './api';
@@ -7,6 +7,7 @@ import type { User } from './types';
 import { HomePage } from './components/HomePage';
 import useFamilyStore from './stores/familyStore';
 import useJoinRequestStore from './stores/joinRequestStore';
+import { BiLogOutCircle } from 'react-icons/bi';
 
 
 
@@ -20,9 +21,15 @@ const App = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  async function handleLogin(e: FormEvent<HTMLFormElement>, creds: User) {
 
-    e.preventDefault();
+  useEffect(() => {
+    if (token) {
+      fetchFamilies(token);
+    }
+  }, [token, fetchFamilies]);
+
+
+  async function handleLogin(creds: User) {
     try {
       const res = await login(creds);
       setSuccessMsg('');
@@ -46,9 +53,8 @@ const App = () => {
     }
   }
 
-  async function handleSignup(e: FormEvent<HTMLFormElement>, creds: User) {
+  async function handleSignup(creds: User) {
 
-    e.preventDefault();
     try {
       setErrorMsg('');
       setSuccessMsg('');
@@ -73,14 +79,14 @@ const App = () => {
     }
   }
 
-  async function handleFamilyCreate(familyData: { familyName: string }) {
+  async function handleFamilyCreate(familyData: { name: string }) {
     try {
       setErrorMsg('');
       setSuccessMsg('');
       const n = await createFamily(token, { ...familyData, userId: user.id });
       addFamily(n.family);
-      user.familyId = n.family.id;
-      setAuth(token, user);
+      const updatedUser = { ...user, familyId: n.family.id };
+      setAuth(token, updatedUser);
       setSuccessMsg("The Family Group was Created Successfully!")
       setTimeout(() => {
         setSuccessMsg('');
@@ -120,16 +126,29 @@ const App = () => {
 
 
   if (!token) {
-    <AuthPage
+    return <AuthPage
       handleLogin={handleLogin}
       handleSignup={handleSignup}
     />
   }
 
-  return (
-    //  main app component when logged in
-    <HomePage user={user} handleFamilyCreate={handleFamilyCreate} handleJoin={handleJoin} />
-  )
+  if (user.familyId === null || user.familyId === undefined) {
+    return <HomePage user={user} handleFamilyCreate={handleFamilyCreate} handleJoin={handleJoin} clearAuth={clearAuth} />
+  } else {
+    return (
+      <>
+        {user.name}
+
+        <button
+          onClick={() => { clearAuth(); console.log("done") }}
+          className="px-4 py-2 rounded-full bg-[var(--secondary)] hover:bg-[var(--secondary-hover)] text-white font-medium transition-all"
+        >
+          <BiLogOutCircle />
+
+        </button>
+      </>
+    )
+  }
 }
 
 export default App

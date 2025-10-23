@@ -11,8 +11,8 @@ export type authType = {
 
 const useAuthStore = create<authType>((set) => ({
 
-    token: localStorage.getItem('token'),
-    user: JSON.parse(localStorage.getItem('user') || ''),
+    token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
+    user: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || "null") : null,
     setAuth: (token, user) => {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));

@@ -11,74 +11,85 @@ datasource db {
         
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  familyId  String
-  family    Family   @relation(fields: [familyId], references: [id])
-   ownedFamily  Family?   @relation("FamilyOwner")
-  ownedItems     ShoppingItem[]  @relation("OwnerItems")
- 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String           @id @default(cuid())
+  email         String           @unique
+  name          String
+  password      String
 
-   sentRequests   FamilyJoinRequest[] @relation("UserRequests")
+
+  familyId      String?
+  family        Family?          @relation(fields: [familyId], references: [id])
+
+  ownedFamily   Family?          @relation("FamilyOwner")
+
+  ownedItems    ShoppingItem[]   @relation("OwnerItems")
+
+  joinRequests  FamilyJoinRequest[]
 }
 
 model Family {
-  id            String         @id @default(cuid())
-  name          String
+  id         String              @id @default(cuid())
+  name       String
+  ownerId    String              @unique
+  owner      User                @relation("FamilyOwner", fields: [ownerId], references: [id])
 
- ownerId    Int       @unique
-  owner      User      @relation("FamilyOwner", fields: [ownerId], references: [id])
-
-  members       User[]
-  shoppingLists ShoppingList[]
-
- joinRequests FamilyJoinRequest[] @relation("FamilyRequests")
-
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  members    User[]
+  lists      ShoppingList[]   
+    items      ShoppingItem[]   
+  requests   FamilyJoinRequest[]
+  createdAt  DateTime            @default(now())
 }
 
 model ShoppingList {
   id         String         @id @default(cuid())
-  title      String          @default("Weekly Shopping List")
-  startDate  DateTime       
-  dueDate    DateTime       
-  archived   Boolean          @default(false)
+  title      String         @default("Weekly Shopping List")
+  startDate  DateTime
+  dueDate    DateTime
+  archived   Boolean        @default(false)
+
   familyId   String
-  family     Family          @relation(fields: [familyId], references: [id])
-  items      ShoppingItem[]
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
+  family     Family         @relation(fields: [familyId], references: [id])
+
+  items      ShoppingItem[] 
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
 }
 
 model ShoppingItem {
-  id             String         @id @default(cuid())
-  name           String
-  description    String?
-  status         ItemStatus      @default(INCLUDED)
-  shoppingListId String
-  shoppingList   ShoppingList    @relation(fields: [shoppingListId], references: [id])
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  status      ItemStatus    @default(INCLUDED)
+
+  familyId    String
+  family      Family        @relation(fields: [familyId], references: [id])
+
+  listId      String
+  list        ShoppingList  @relation(fields: [listId], references: [id])
+
+  ownerId     String
+  owner       User          @relation("OwnerItems", fields: [ownerId], references: [id])
+
+  createdAt   DateTime      @default(now())
 }
 
-
-
 model FamilyJoinRequest {
-  id         Int      @id @default(autoincrement())
-  user       User     @relation("UserRequests", fields: [userId], references: [id])
-  userId     Int
-  family     Family   @relation("FamilyRequests", fields: [familyId], references: [id])
-  familyId   Int
-  status     String   @default("PENDING") 
-  createdAt  DateTime @default(now())
+  id        String         @id @default(cuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id])
+  familyId  String
+  family    Family         @relation(fields: [familyId], references: [id])
+  status    RequestStatus  @default(PENDING)
+  createdAt DateTime       @default(now())
 }
 
 enum ItemStatus {
   INCLUDED
   SKIPPED
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

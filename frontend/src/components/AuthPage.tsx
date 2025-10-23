@@ -1,16 +1,16 @@
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
 import { FaShoppingCart } from 'react-icons/fa'
 
 type Props = {
-    handleLogin: (e: FormEvent<HTMLFormElement>) => void,
-    handleSignup: (e: FormEvent<HTMLFormElement>) => void
+    handleLogin: (data: { email: string, password: string }) => void | Promise<void>;
+    handleSignup: (data: { email: string, password: string, name: string }) => void | Promise<void>;
 }
 
 const AuthPage = ({ handleLogin, handleSignup, }: Props) => {
 
     const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
-    const [loginEmail, setLoginEmail] = useState('');
-    const [loginPassword, setLoginPassword] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [signupName, setSignupName] = useState('');
     const [signupEmail, setSignupEmail] = useState('');
     const [signupPassword, setSignupPassword] = useState('');
@@ -57,7 +57,7 @@ const AuthPage = ({ handleLogin, handleSignup, }: Props) => {
 
                         {activeTab === 'login' && (
                             <form
-                                onSubmit={handleLogin}
+                                onSubmit={(e) => { e.preventDefault(); handleLogin({ email, password }); }}
                                 className="space-y-4">
                                 <div className="space-y-2">
                                     <label htmlFor="login-email" className="block">
@@ -67,8 +67,8 @@ const AuthPage = ({ handleLogin, handleSignup, }: Props) => {
                                         id="login-email"
                                         type="email"
                                         placeholder="john@example.com"
-                                        value={loginEmail}
-                                        onChange={(e) => setLoginEmail(e.target.value)}
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
                                         required
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
@@ -81,8 +81,8 @@ const AuthPage = ({ handleLogin, handleSignup, }: Props) => {
                                     <input
                                         id="login-password"
                                         type="password"
-                                        value={loginPassword}
-                                        onChange={(e) => setLoginPassword(e.target.value)}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
                                         required
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
@@ -98,8 +98,10 @@ const AuthPage = ({ handleLogin, handleSignup, }: Props) => {
                         )}
 
                         {activeTab === 'signup' && (
-                            <form
-                                onSubmit={handleSignup}
+                            <form onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSignup({ email: signupEmail, password: signupPassword, name: signupName });
+                            }}
                                 className="space-y-4">
                                 <div className="space-y-2">
                                     <label htmlFor="signup-name" className="block">
