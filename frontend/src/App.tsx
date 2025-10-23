@@ -8,6 +8,7 @@ import { HomePage } from './components/HomePage';
 import useFamilyStore from './stores/familyStore';
 import useJoinRequestStore from './stores/joinRequestStore';
 import { BiLogOutCircle } from 'react-icons/bi';
+import useListStore from './stores/ListStore';
 
 
 
@@ -15,6 +16,7 @@ const App = () => {
   const { token, user, setAuth, clearAuth } = useAuthStore();
   const { families, fetchFamilies, addFamily } = useFamilyStore();
   const { requests, sendJoinRequest } = useJoinRequestStore();
+  const { currentList, lists, fetchLists, fetchCurrentList } = useListStore();
 
 
 
@@ -124,6 +126,36 @@ const App = () => {
     }
   };
 
+  async function getLists() {
+    try {
+      await fetchLists(token);
+      setErrorMsg('');
+      setSuccessMsg("Lists Fetched Successfully!")
+      setTimeout(() => {
+        setSuccessMsg('');
+      }, 5000);
+    } catch (err) {
+      console.error("Failed to fetch lists", err);
+      setErrorMsg('Failed to fetch lists');
+      setTimeout(() => {
+        setErrorMsg('');
+      }, 5000);
+    }
+  }
+
+  async function getCurrentList() {
+    try {
+      await fetchCurrentList(token);
+      setErrorMsg('');
+      setSuccessMsg("Current List Fetched Successfully!")
+    } catch (err) {
+      console.error("Failed to fetch current list", err);
+      setErrorMsg('Failed to fetch current list');
+      setTimeout(() => {
+        setErrorMsg('');
+      }, 5000);
+    }
+  }
 
   if (!token) {
     return <AuthPage
@@ -137,15 +169,7 @@ const App = () => {
   } else {
     return (
       <>
-        {user.name}
-
-        <button
-          onClick={() => { clearAuth(); console.log("done") }}
-          className="px-4 py-2 rounded-full bg-[var(--secondary)] hover:bg-[var(--secondary-hover)] text-white font-medium transition-all"
-        >
-          <BiLogOutCircle />
-
-        </button>
+        <Dashboard user={user} getLists={getLists} lists={lists} currentList={currentList} getCurrentList={getCurrentList} />
       </>
     )
   }
