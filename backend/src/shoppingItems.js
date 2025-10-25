@@ -102,7 +102,7 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const id = req.params.id;
-  const { name, quantity, status, purchased } = req.body;
+  const { status, purchased } = req.body;
 
   try {
     const shoppingItem = await prisma.shoppingItem.findUnique({
@@ -113,18 +113,17 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Not found' });
     }
 
-    let finalStatus = status;
+    const updateData = {};
+
     if (purchased !== undefined) {
-      finalStatus = purchased ? 'PURCHASED' : 'INCLUDED';
+      updateData.status = purchased ? 'PURCHASED' : 'INCLUDED';
+    } else if (status) {
+      updateData.status = status;
     }
 
     const updated = await prisma.shoppingItem.update({
       where: { id },
-      data: {
-        ...(name && { name }),
-        ...(quantity !== undefined && { quantity }),
-        ...(finalStatus && { status: finalStatus }),
-      },
+      data: updateData,
       include: {
         owner: {
           select: { id: true, name: true },
@@ -135,7 +134,7 @@ router.put('/:id', async (req, res) => {
     res.json(updated);
   } catch (error) {
     console.error('Update item error:', error);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error', details: error.message });
   }
 });
 

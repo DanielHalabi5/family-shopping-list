@@ -6,8 +6,8 @@ type ShoppingItemStoreType = {
     items: ShoppingItem[];
     setItems: (items: ShoppingItem[]) => void;
     fetchItems: (token: string, listId: string) => Promise<void>;
-    createItem: (token: string, newItem: { name: string; quantity: number; purchased: boolean; listId: string; }) => Promise<void>;
-    updateItem: (token: string, id: string, updates: { name?: string; quantity?: number; purchased?: boolean; }) => Promise<void>;
+    createItem: (token: string, newItem: { name: string; quantity: string; purchased: boolean; listId: string; }) => Promise<void>;
+    updateItem: (token: string, id: string, updates: { status: string, purchased?: boolean; }) => Promise<void>;
     deleteItem: (token: string, id: string) => Promise<void>;
 }
 

@@ -1,25 +1,27 @@
 import { useEffect, useState } from 'react';
 import AuthPage from './components/AuthPage';
 import useAuthStore from './stores/authStore';
-import { createFamily, login, signup } from './api';
+import { approveJoinRequest, createFamily, login, rejectJoinRequest, signup } from './api';
 import { HomePage } from './components/HomePage';
 import useFamilyStore from './stores/familyStore';
 import useJoinRequestStore from './stores/joinRequestStore';
 import useListStore from './stores/ListStore';
-import Dashboard from './components/Dashboard';
 import useItemsStore from './stores/shoppingItemsStore';
 import { Header } from './components/Header';
+import { JoinRequests } from './components/JoinRquests';
+import { PreviousLists } from './components/PreviousLists';
+import Dashboard from './components/DashBoard';
 
 const App = () => {
   const { token, user, setAuth, clearAuth } = useAuthStore();
   const { families, fetchFamilies, addFamily } = useFamilyStore();
-  const { sendJoinRequest } = useJoinRequestStore();
-  const { currentList, fetchLists, fetchCurrentList } = useListStore();
+  const { requests, fetchRequests } = useJoinRequestStore();
+  const { currentList, fetchCurrentList, fetchLists, lists } = useListStore();
   const { createItem, updateItem, deleteItem } = useItemsStore();
 
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-  const [currentPage, setCurrentPage] = useState<'auth' | 'home' | 'dashboard' | 'join-requests' | 'previous-lists'>('auth');
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'join-requests' | 'previous-lists'>('dashboard');
 
   useEffect(() => {
     if (token) {
@@ -27,8 +29,9 @@ const App = () => {
       if (user?.familyId) {
         fetchCurrentList(token);
       }
+      fetchRequests(token);
     }
-  }, [token, user?.familyId, fetchFamilies, fetchCurrentList]);
+  }, [token, user?.familyId, fetchFamilies, fetchCurrentList, fetchRequests]);
 
   async function handleLogin(creds: { email: string; password: string }) {
     try {
@@ -73,40 +76,41 @@ const App = () => {
     }
   }
 
-async function handleFamilyCreate(familyData: { name: string }) {
-  try {
-    setErrorMsg('');
-    setSuccessMsg('');
-    const response = await createFamily(token!, { ...familyData, userId: user!.id });
-
-    addFamily(response.family);
-
-    if (response.token && response.user) {
-      setAuth(response.token, response.user);
-    } else {
-      const updatedUser = { ...user!, familyId: response.family.id };
-      setAuth(token!, updatedUser);
-    }
-    setSuccessMsg("The Family Group was Created Successfully!");
-    setTimeout(() => {
-      setSuccessMsg('');
-    }, 5000);
-  } catch (err: any) {
-    if (err.response?.data?.error) {
-      setErrorMsg(err.response.data.error);
-    } else {
-      setErrorMsg('Something went wrong.');
-    }
-    setTimeout(() => {
+  async function handleFamilyCreate(familyData: { name: string }) {
+    try {
       setErrorMsg('');
-    }, 5000);
+      setSuccessMsg('');
+      const response = await createFamily(token!, { ...familyData, userId: user!.id });
+
+      addFamily(response.family);
+
+      if (response.token && response.user) {
+        setAuth(response.token, response.user);
+      } else {
+        const updatedUser = { ...user!, familyId: response.family.id };
+        setAuth(token!, updatedUser);
+      }
+      setSuccessMsg("The Family Group was Created Successfully!");
+      setTimeout(() => {
+        setSuccessMsg('');
+      }, 5000);
+    } catch (err: any) {
+      if (err.response?.data?.error) {
+        setErrorMsg(err.response.data.error);
+      } else {
+        setErrorMsg('Something went wrong.');
+      }
+      setTimeout(() => {
+        setErrorMsg('');
+      }, 5000);
+    }
   }
-}
 
   async function handleJoin(familyId: string) {
     try {
       setErrorMsg('');
       setSuccessMsg('');
+      const { sendJoinRequest } = useJoinRequestStore.getState();
       await sendJoinRequest(token!, user!.id, familyId);
       setSuccessMsg("The Join Request Was Successfully Sent");
       setTimeout(() => {
@@ -120,22 +124,6 @@ async function handleFamilyCreate(familyData: { name: string }) {
     }
   }
 
-  async function getLists() {
-    try {
-      await fetchLists(token!);
-      setErrorMsg('');
-      setSuccessMsg("Lists Fetched Successfully!");
-      setTimeout(() => {
-        setSuccessMsg('');
-      }, 5000);
-    } catch (err) {
-      console.error("Failed to fetch lists", err);
-      setErrorMsg('Failed to fetch lists');
-      setTimeout(() => {
-        setErrorMsg('');
-      }, 5000);
-    }
-  }
 
   async function getCurrentList() {
     try {
@@ -160,7 +148,7 @@ async function handleFamilyCreate(familyData: { name: string }) {
     }
   }
 
-  async function handleUpdate(id: string, data: { purchased?: boolean; status?: string }) {
+  async function handleUpdate(id: string, data: { status: string , purchased: boolean }) {
     try {
       await updateItem(token!, id, data);
       await getCurrentList();
@@ -177,6 +165,35 @@ async function handleFamilyCreate(familyData: { name: string }) {
     } catch (err) {
       console.error("Failed to delete item", err);
       setErrorMsg('Failed to delete item');
+    }
+  }
+
+
+  async function handleApproveRequest(requestId: string) {
+    try {
+      setErrorMsg('');
+      setSuccessMsg('');
+      await approveJoinRequest(token!, requestId);
+      await fetchRequests(token!);
+      setSuccessMsg("Request approved successfully!");
+      setTimeout(() => setSuccessMsg(''), 5000);
+    } catch (err) {
+      setErrorMsg("Failed to approve request");
+      setTimeout(() => setErrorMsg(''), 5000);
+    }
+  }
+
+  async function handleRejectRequest(requestId: string) {
+    try {
+      setErrorMsg('');
+      setSuccessMsg('');
+      await rejectJoinRequest(token!, requestId);
+      await fetchRequests(token!);
+      setSuccessMsg("Request rejected successfully!");
+      setTimeout(() => setSuccessMsg(''), 5000);
+    } catch (err) {
+      setErrorMsg("Failed to reject request");
+      setTimeout(() => setErrorMsg(''), 5000);
     }
   }
 
@@ -203,14 +220,7 @@ async function handleFamilyCreate(familyData: { name: string }) {
     : null;
 
   const isAdmin = userFamily ? userFamily.ownerId === user.id : false;
-  console.log('🔍 Admin Check:', {
-    'User ID': user.id,
-    'User Family ID': user.familyId,
-    'Total Families': families.length,
-    'User Family Found': !!userFamily,
-    'Owner ID': userFamily?.ownerId,
-    'Is Admin': isAdmin
-  });
+
 
   if (!user.familyId) {
     return (
@@ -238,12 +248,12 @@ async function handleFamilyCreate(familyData: { name: string }) {
   return (
     <>
       {errorMsg && (
-        <div className="fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50">
+        <div className="fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50 shadow-lg">
           {errorMsg}
         </div>
       )}
       {successMsg && (
-        <div className="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50">
+        <div className="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50 shadow-lg">
           {successMsg}
         </div>
       )}
@@ -254,15 +264,31 @@ async function handleFamilyCreate(familyData: { name: string }) {
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
       />
-      <Dashboard
-        user={user}
-        families={families}
-        currentList={currentList}
-        handleCreate={handleCreate}
-        handleUpdate={handleUpdate}
-        handleDelete={handleDelete}
-        getCurrentList={getCurrentList}
-      />
+
+      {currentPage === 'dashboard' && (
+        <Dashboard
+          user={user}
+          families={families}
+          currentList={currentList}
+          handleCreate={handleCreate}
+          handleUpdate={handleUpdate}
+          handleDelete={handleDelete}
+          getCurrentList={getCurrentList}
+        />
+      )}
+
+      {currentPage === 'join-requests' && isAdmin && (
+        <JoinRequests
+          requests={requests}
+          onApprove={handleApproveRequest}
+          onReject={handleRejectRequest}
+        />
+      )}
+
+      {currentPage === 'previous-lists' && userFamily && (
+        <PreviousLists familyId={userFamily.id} token={token} fetchLists={fetchLists} lists={lists} />
+      )}
+
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { FaCheck, FaCopy, FaPlus, FaTrash, FaUsers } from 'react-icons/fa';
+import { FaCopy, FaPlus, FaTrash, FaUsers } from 'react-icons/fa';
 import type { Family, List, ShoppingItem, User } from '../types';
 import { useState } from 'react';
 
@@ -9,16 +9,15 @@ type Props = {
     handleCreate: (taskData: { name: string; quantity: string; listId: string; }) => Promise<void>;
     handleUpdate: (id: string, data: { purchased?: boolean }) => Promise<void>;
     handleDelete: (id: string) => Promise<void>;
-    getCurrentList: () => Promise<void>;
 }
 
-const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, handleDelete, getCurrentList }: Props) => {
+const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, handleDelete }: Props) => {
     const [newItemName, setNewItemName] = useState('');
     const [newItemQuantity, setNewItemQuantity] = useState('');
 
     function copyToClipboard(text: string) {
         navigator.clipboard.writeText(text).then(() => {
-            console.log('Text copied to clipboard!');
+            alert('Family code copied to clipboard!');
         }).catch(err => {
             console.error('Failed to copy text: ', err);
         });
@@ -38,16 +37,19 @@ const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, ha
 
         setNewItemName('');
         setNewItemQuantity('');
-        await getCurrentList();
     };
 
     const handleTogglePurchased = async (item: ShoppingItem) => {
-        await handleUpdate(item.id, { purchased: !item.purchased });
+        const isPurchased = item.status === 'PURCHASED' || item.purchased === true;
+        await handleUpdate(item.id, { purchased: !isPurchased });
     };
 
     const handleDeleteItem = async (id: string) => {
         await handleDelete(id);
-        await getCurrentList();
+    };
+
+    const isItemPurchased = (item: ShoppingItem) => {
+        return item.status === 'PURCHASED' || item.purchased === true;
     };
 
     const userFamily = families.find(fam => fam.id === user.familyId);
@@ -55,6 +57,9 @@ const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, ha
     const allItems = Array.isArray(currentList)
         ? currentList.flatMap(list => list.items || [])
         : [];
+
+    const purchasedItems = allItems.filter(item => isItemPurchased(item));
+    const unpurchasedItems = allItems.filter(item => !isItemPurchased(item));
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">
@@ -75,8 +80,6 @@ const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, ha
                             </button>
                         )}
                     </div>
-
-
 
                     {userFamily && (
                         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
@@ -104,12 +107,12 @@ const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, ha
                                 </div>
 
                                 {allItems.length > 0 && (
-                                    <button
-                                        className="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-white transition-colors flex items-center gap-2"
-                                    >
-                                        <FaCheck className="w-4 h-4" />
-                                        Complete This Week
-                                    </button>
+                                    <div className="text-right">
+                                        <div className="text-sm text-gray-600 mb-1">Progress</div>
+                                        <div className="text-2xl font-bold text-blue-600">
+                                            {purchasedItems.length}/{allItems.length}
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         </div>
@@ -168,15 +171,15 @@ const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, ha
                             </div>
                         </div>
 
-                        {allItems.length > 0 && (
+                        {unpurchasedItems.length > 0 && (
                             <div className="bg-white rounded-lg shadow border border-gray-200">
                                 <div className="p-6 border-b border-gray-200">
-                                    <h3 className="mb-1">Active Items ({allItems.length})</h3>
+                                    <h3 className="mb-1">To Purchase ({unpurchasedItems.length})</h3>
                                     <p className="text-gray-600">Items that need to be purchased</p>
                                 </div>
                                 <div className="p-6">
                                     <div className="space-y-3">
-                                        {allItems.map((item) => (
+                                        {unpurchasedItems.map((item) => (
                                             <div
                                                 key={item.id}
                                                 className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
@@ -184,17 +187,19 @@ const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, ha
                                                 <div className="flex items-center gap-3 flex-1">
                                                     <input
                                                         type="checkbox"
-                                                        checked={item.purchased}
+                                                        checked={false}
                                                         onChange={() => handleTogglePurchased(item)}
-                                                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                        className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                                                     />
                                                     <div className="flex-1">
-                                                        <p className={item.purchased ? 'line-through text-gray-500' : ''}>{item.name}</p>
+                                                        <p className="font-medium">{item.name}</p>
                                                         <p className="text-sm text-gray-500">{item.quantity}</p>
                                                     </div>
-                                                    <span className="inline-flex items-center px-2 py-1 rounded text-xs border border-gray-200 bg-white">
-                                                        {user.name}
-                                                    </span>
+                                                    {item.owner && (
+                                                        <span className="inline-flex items-center px-2 py-1 rounded text-xs border border-gray-200 bg-white">
+                                                            {item.owner.name}
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 <button
                                                     onClick={() => handleDeleteItem(item.id)}
@@ -208,6 +213,77 @@ const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, ha
                                 </div>
                             </div>
                         )}
+
+                        {purchasedItems.length > 0 && (
+                            <div className="bg-white rounded-lg shadow border border-gray-200">
+                                <div className="p-6 border-b border-gray-200">
+                                    <h3 className="mb-1">Purchased ({purchasedItems.length})</h3>
+                                    <p className="text-gray-600">Items already bought</p>
+                                </div>
+                                <div className="p-6">
+                                    <div className="space-y-3">
+                                        {purchasedItems.map((item) => (
+                                            <div
+                                                key={item.id}
+                                                className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200"
+                                            >
+                                                <div className="flex items-center gap-3 flex-1">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={true}
+                                                        onChange={() => handleTogglePurchased(item)}
+                                                        className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500 cursor-pointer"
+                                                    />
+                                                    <div className="flex-1 opacity-75">
+                                                        <p className="font-medium line-through">{item.name}</p>
+                                                        <p className="text-sm text-gray-500 line-through">{item.quantity}</p>
+                                                    </div>
+                                                    {item.owner && (
+                                                        <span className="inline-flex items-center px-2 py-1 rounded text-xs border border-green-300 bg-green-100 text-green-700">
+                                                            {item.owner.name}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <button
+                                                    onClick={() => handleDeleteItem(item.id)}
+                                                    className="ml-2 p-2 text-red-500 hover:bg-red-50 rounded transition-colors"
+                                                >
+                                                    <FaTrash className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {allItems.length === 0 && (
+                            <div className="bg-white rounded-lg shadow border border-gray-200">
+                                <div className="p-12 text-center">
+                                    <div className="text-gray-400 mb-4">
+                                        <FaPlus className="w-16 h-16 mx-auto" />
+                                    </div>
+                                    <h3 className="text-xl font-semibold mb-2">No items yet</h3>
+                                    <p className="text-gray-500">
+                                        Start by adding items to your shopping list
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="space-y-6">
+                        <div className="bg-white rounded-lg shadow border border-gray-200">
+                            <div className="p-6 border-b border-gray-200">
+                                <h3>Tips</h3>
+                            </div>
+                            <div className="p-6 space-y-3 text-sm text-gray-600">
+                                <p>• Share the family code with members to let them join</p>
+                                <p>• Check off items as you shop</p>
+                                <p>• Complete the week to archive and start fresh</p>
+                                <p>• View previous lists in the History section</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

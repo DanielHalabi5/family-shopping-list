@@ -62,3 +62,20 @@ export async function fetchShoppingItems(token: string, listId: string) {
   const res = await axios.get(`${API_URL}/shoppingItems/list/${listId}`, { headers: authHeader(token) });
   return res.data;
 }
+
+export async function fetchRequests(token) {
+  const res = await fetch(`${API_URL}/request/pending`, {
+    headers: authHeader(token)
+  });
+  return res.json();
+}
+
+export async function approveJoinRequest(token: string, requestId: string) {
+  const res = await axios.post(`${API_URL}/request/${requestId}`, { action: 'APPROVE' }, { headers: authHeader(token) });
+  return res.data;
+}
+
+export async function rejectJoinRequest(token: string, requestId: string) {
+  const res = await axios.post(`${API_URL}/request/${requestId}`, { action: 'REJECT' }, { headers: authHeader(token) });
+  return res.data;
+}

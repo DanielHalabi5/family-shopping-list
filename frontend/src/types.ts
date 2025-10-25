@@ -4,6 +4,8 @@ export type User = {
   name: string;
   password?: string;
   familyId?: string | null;
+    createdAt: string;
+  updatedAt: string;
 };
 
 export type Family = {
@@ -11,6 +13,8 @@ export type Family = {
   name: string;
   ownerId: string;
   members?: string[];
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type JoinRequest = {
@@ -19,6 +23,8 @@ export type JoinRequest = {
   userName: string;
   familyId: string;
   status: 'pending' | 'approved' | 'rejected';
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type List = {
@@ -27,6 +33,9 @@ export type List = {
   start: string;
   end: string;
   items?: ShoppingItem[];
+  archived: boolean;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type ShoppingItem = {
@@ -40,4 +49,6 @@ export type ShoppingItem = {
     id: string;
     name: string;
   };
+  createdAt: string;
+  updatedAt: string;
 };

@@ -87,8 +87,8 @@ model FamilyJoinRequest {
 enum ItemStatus {
   INCLUDED
   SKIPPED
+  PURCHASED
 }
-
 enum RequestStatus {
   PENDING
   APPROVED

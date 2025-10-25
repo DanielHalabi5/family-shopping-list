@@ -7,6 +7,9 @@ I want to be able to create a Shopping Item to shop on saturday
 I want to be able to delete a item
 I want to be able to update a item
 
+as an admin:
+iwant to be able to accept join requests
+
 Due Date is saturday
 Title
 Description
@@ -37,7 +40,7 @@ Components
 	Member Card
 
 # API / Backend
-ShoppingController
+ShoppingItemController
 Create
 Read
 Update
@@ -53,3 +56,6 @@ Create
 Join
 List members
 Kick member
+
+shoppingListController
+Read

@@ -7,9 +7,7 @@ import middleware from './middleware.js';
 const router = Router();
 
 router.use(cors());
-const JWT_SECRET = process.env.JWT_SECRET || 'changeme';
 
-const { sign } = jwt;
 
 router.post('/', async (req, res) => {
   const { userId, familyId } = req.body;
@@ -51,7 +49,7 @@ router.post('/:id', middleware, async (req, res) => {
 
   try {
     const request = await prisma.familyJoinRequest.findUnique({
-      where: { id: parseInt(requestId) },
+      where: { id: requestId },
       include: { family: true, user: true },
     });
 
