@@ -34,3 +34,4 @@ jobs:
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build || echo "No build script found"
+
