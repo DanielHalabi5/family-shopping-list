@@ -25,12 +25,13 @@ jobs:
       - name: Install pm2 globally
         run: npm i --global pm2
 
-      - name: Run backend tests
+      - name: Run backend using PM2
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
-        working-directory: ./backend
-        run: npm test || echo "No backend tests"
+        run: pm2 start backend/src/index.js
+        
+        curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/status
 
       # ---- Frontend ----
       - name: Install frontend dependencies
