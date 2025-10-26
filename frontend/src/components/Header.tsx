@@ -16,12 +16,8 @@ export function Header({ user, isAdmin, currentPage, setCurrentPage, clearAuth }
     return (
         <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
+                <div className="flex justify-between items-center flex-wrap h-16 sm:text-xs">
                     <div className="flex items-center gap-8">
-                        <h1 className="text-blue-600 flex items-center gap-2">
-                            <FaShoppingCart className="w-6 h-6" />
-                            FamilyCart
-                        </h1>
                         {user && (
                             <nav className="flex gap-2">
                                 <button
@@ -31,6 +27,7 @@ export function Header({ user, isAdmin, currentPage, setCurrentPage, clearAuth }
                                         : 'text-gray-700 hover:bg-gray-100'
                                         }`}
                                 >
+                                    <FaShoppingCart className="w-4 h-4 inline mr-2" />
                                     Shopping List
                                 </button>
 
