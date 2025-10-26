@@ -22,6 +22,9 @@ jobs:
         working-directory: ./backend
         run: npm install
 
+      - name: Install pm2 globally
+        run: npm i --global pm2
+
       - name: Run backend tests
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
