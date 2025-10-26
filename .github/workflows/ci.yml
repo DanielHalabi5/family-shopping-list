@@ -22,9 +22,16 @@ jobs:
         working-directory: ./backend
         run: npm install
 
+      - name: Install backend pm2
+        working-directory: ./backend
+        run: npm i --global pm2
+
       - name: Run backend tests
         working-directory: ./backend
-        run: npm test || echo "No backend tests"
+        run:  |
+          cd ./backend
+          npm Install
+          pm2 start src/index.ts 
 
       # ---- Frontend ----
       - name: Install frontend dependencies
