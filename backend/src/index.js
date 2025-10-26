@@ -21,7 +21,7 @@ app.use('/api/request', requestRoutes);
 app.use('/api/shoppingList', ListRoutes);
 app.use('/api/shoppingItems', ItemsRoutes);
 
-app.get('/', (req, res) => res.json({ ok: true }));
+app.get('/status', (req, res) => res.json({ ok: true }));
 
 app.listen(PORT, () => {
   console.log(`https://localhost:${PORT}`);
