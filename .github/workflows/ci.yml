@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
@@ -23,6 +23,9 @@ jobs:
         run: npm install
 
       - name: Run backend tests
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
         working-directory: ./backend
         run: npm test || echo "No backend tests"
 
@@ -34,4 +37,3 @@ jobs:
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build || echo "No build script found"
-
