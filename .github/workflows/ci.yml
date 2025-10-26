@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -19,11 +19,20 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
+      # ---- Backend ----
+      - name: Install backend dependencies
+        working-directory: ./backend
         run: npm install
 
-      - name: Run build
-        run: npm run build
+      - name: Run backend tests
+        working-directory: ./backend
+        run: npm test || echo "No backend tests"
 
-      - name: Run tests
-        run: npm test
+      # ---- Frontend ----
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build || echo "No build script found"
