@@ -5,39 +5,38 @@ I want to be able to register
 I want to be able to login
 I want to be able to create a Shopping Item to shop on saturday
 I want to be able to delete a item
-I want to be able to update a item
+I want to be able to update a item : status (purshased or Skipped)
 
 as an admin:
 iwant to be able to accept join requests
 
-Due Date is saturday
-Title
-Description
 
 # Pages
 Login / Sign In Or Register
 Join an existing family / Create your own
-Family dashboard
-Overview
-Members
-shopping list page
+Family dashboard Overview
+join requests
+archived shopping list 
 
-
-Filters
-	All, Skipped, Included
-Sorting:
-	By weeks
 
 Components
-	Header
+AuthPage
+login/Signup
+
+user Signin? || !hasFamily
+homepage
+create or join family
+
+
+Header
+	Signed In?
 	App logo
 	Nav
-	
-	Signed In?
-	Status
-	Dashboard
-	Shopping list
-	Member Card
+
+user admin? || hasFamily?
+dashboard: Family shopping list	
+			admin? joinRequest
+			previousList
 
 # API / Backend
 ShoppingItemController
@@ -58,4 +57,35 @@ List members
 Kick member
 
 shoppingListController
+function endDate ="saturday" startdate= "monday"
 Read
+
+
+Theme:
+
+Background (Signup/Login):
+Soft blue–indigo gradient → calm, trustworthy, and modern first impression.
+
+Nav Buttons:
+gray → clean, minimal look; whitens on active for feedback.
+
+Confirm/Submit Buttons:
+Deep blue → emphasizes trust and importance; darker on hover for action clarity.
+
+Input Fields:
+Light gray borders + blue focus ring → simple, friendly, and accessible design.
+
+Create Family Section:
+Light blue tones → symbolizes reliability and guidance.
+
+Join Family Section:
+Amber tones → represents warmth, connection, and friendliness.
+
+Overall Feel:
+Balanced mix of trust (blue), warmth (amber), and clean modern design (white/gray) → ideal for a family-oriented and user-friendly interface.
+
+
+font-medium
+better readability and visual balance
+Adds a slight emphasis to key elements 
+maintain a clean and professional look

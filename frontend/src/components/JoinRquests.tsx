@@ -1,12 +1,15 @@
 import { FaClock, FaUserCheck, FaUserSlash } from "react-icons/fa";
+import type { JoinRequest } from "../types";
 
 type JoinRequestsProps = {
-
+    requests: JoinRequest[];
+    onApprove: (requestId: string) => Promise<void>;
+    onReject: (requestId: string) => Promise<void>;
 };
 
-export function JoinRequests({ user, successMsg, errorMsg, requests = [], onApprove, onReject }: JoinRequestsProps) {
+export function JoinRequests({ requests = [], onApprove, onReject }: JoinRequestsProps) {
 
-    async function handleAction(requestId, action) {
+    async function handleAction(requestId: string, action: 'APPROVE' | 'REJECT') {
         try {
             if (action === 'APPROVE') await onApprove(requestId);
             else await onReject(requestId);

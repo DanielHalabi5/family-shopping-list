@@ -25,6 +25,10 @@ export type JoinRequest = {
   status: 'pending' | 'approved' | 'rejected';
   createdAt: string;
   updatedAt: string;
+  user: {
+    id: string;
+    name: string;
+  };
 };
 
 export type List = {
