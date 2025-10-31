@@ -15,7 +15,7 @@ import Dashboard from './components/DashBoard';
 const App = () => {
   const { token, user, setAuth, clearAuth } = useAuthStore();
   const { families, fetchFamilies, addFamily } = useFamilyStore();
-  const { requests, fetchRequests } = useJoinRequestStore();
+  const { requests, fetchRequests, sendJoinRequest } = useJoinRequestStore();
   const { currentList, fetchCurrentList, fetchLists, lists } = useListStore();
   const { createItem, updateItem, deleteItem } = useItemsStore();
 
@@ -110,14 +110,17 @@ const App = () => {
     try {
       setErrorMsg('');
       setSuccessMsg('');
-      const { sendJoinRequest } = useJoinRequestStore.getState();
       await sendJoinRequest(token!, user!.id, familyId);
       setSuccessMsg("The Join Request Was Successfully Sent");
       setTimeout(() => {
         setSuccessMsg('');
       }, 5000);
-    } catch (err) {
-      setErrorMsg('Request Was Already Sent');
+    } catch (err: unknown) {
+      if (err.response?.data?.error?.includes('already') || err.response?.status === 409) {
+        setErrorMsg('You have already sent a join request to this family');
+      } else {
+        setErrorMsg('Failed to send join request');
+      }
       setTimeout(() => {
         setErrorMsg('');
       }, 5000);
@@ -148,15 +151,17 @@ const App = () => {
     }
   }
 
-  async function handleUpdate(id: string, data: { status: string , purchased: boolean }) {
+  async function handleUpdate(id: string, data: { purchased?: boolean }) {
     try {
-      await updateItem(token!, id, data);
+      const status = data.purchased ? 'PURCHASED' : 'SKIPPED';
+      await updateItem(token!, id, { status, purchased: data.purchased });
       await getCurrentList();
     } catch (err) {
       console.error("Failed to update item", err);
       setErrorMsg('Failed to update item');
     }
   }
+
 
   async function handleDelete(id: string) {
     try {
@@ -247,17 +252,8 @@ const App = () => {
 
   return (
     <>
-      {errorMsg && (
-        <div className="fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50 shadow-lg">
-          {errorMsg}
-        </div>
-      )}
-      {successMsg && (
-        <div className="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50 shadow-lg">
-          {successMsg}
-        </div>
-      )}
       <Header
+
         user={user}
         isAdmin={!!isAdmin}
         clearAuth={clearAuth}
@@ -265,8 +261,23 @@ const App = () => {
         setCurrentPage={setCurrentPage}
       />
 
+      <div className="flex items-center justify-center mb-6 px-4 sm:px-6 lg:px-8 space-y-2">
+        {errorMsg && (
+          <div className=" bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg">
+            {errorMsg}
+          </div>
+        )}
+        {successMsg && (
+          <div className=" bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow-lg">
+            {successMsg}
+          </div>
+        )}
+      </div>
+
       {currentPage === 'dashboard' && (
         <Dashboard
+          errorMsg={errorMsg}
+          successMsg={successMsg}
           user={user}
           families={families}
           currentList={currentList}

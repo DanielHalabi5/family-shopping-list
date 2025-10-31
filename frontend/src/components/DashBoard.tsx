@@ -9,9 +9,11 @@ type Props = {
     handleCreate: (taskData: { name: string; quantity: string; listId: string; }) => Promise<void>;
     handleUpdate: (id: string, data: { purchased?: boolean }) => Promise<void>;
     handleDelete: (id: string) => Promise<void>;
+    errorMsg: string;
+    successMsg: string;
 }
 
-const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, handleDelete }: Props) => {
+const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, handleDelete, errorMsg, successMsg }: Props) => {
     const [newItemName, setNewItemName] = useState('');
     const [newItemQuantity, setNewItemQuantity] = useState('');
 
@@ -91,7 +93,7 @@ const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, ha
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {userFamily.members && Array.isArray(userFamily.members) ? (
-                                            userFamily.members.map((member: any) => (
+                                            userFamily.members.map((member) => (
                                                 <span
                                                     key={member.id}
                                                     className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-white border border-gray-200"

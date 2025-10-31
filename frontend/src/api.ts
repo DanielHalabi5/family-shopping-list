@@ -48,7 +48,7 @@ export async function createShoppingItem(token: string, newItem: { name: string;
   return res.data;
 }
 
-export async function updateShoppingItem(token: string, id: string, updates: { name?: string; quantity?: string; purchased?: boolean }) {
+export async function updateShoppingItem(token: string, id: string, updates: { status?: string; purchased?: boolean }) {
   const res = await axios.put(`${API_URL}/shoppingItems/${id}`, updates, { headers: authHeader(token) });
   return res.data;
 }
@@ -63,7 +63,7 @@ export async function fetchShoppingItems(token: string, listId: string) {
   return res.data;
 }
 
-export async function fetchRequests(token) {
+export async function fetchRequests(token: string) {
   const res = await fetch(`${API_URL}/request/pending`, {
     headers: authHeader(token)
   });
