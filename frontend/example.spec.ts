@@ -13,11 +13,9 @@ test('full app flow: login, create/join family, and add items', async ({ page })
   await page.getByRole('button', { name: 'Add to List' }).click();
 
   // Copy family code
-  page.once('dialog', dialog => {
-    console.log('Dialog message:', dialog.message());
-    dialog.dismiss().catch(() => { });
-  });
-  await page.getByRole('button', { name: 'Copy Family Code' }).click();
+  const copyButton = page.getByRole('button', { name: /Copy Family Code|Copy Code/i });
+  await expect(copyButton).toBeVisible({ timeout: 10000 });
+  await copyButton.click();
 
   // Logout
   await page.getByRole('button', { name: 'test Logout' }).click();
