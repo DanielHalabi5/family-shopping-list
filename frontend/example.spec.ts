@@ -7,15 +7,14 @@ test('full app flow: login, create/join family, and add items', async ({ page })
   await page.getByRole('textbox', { name: 'Password' }).fill('testpass');
   await page.locator('form').getByRole('button', { name: 'Login' }).click();
 
-  // Create item
-  await page.getByRole('textbox', { name: 'Item Name' }).fill('Milk');
-  await page.getByRole('textbox', { name: 'Quantity' }).fill('2 Liters');
-  await page.getByRole('button', { name: 'Add to List' }).click();
-
-  // Copy family code
   const copyButton = page.getByRole('button', { name: /Copy Family Code|Copy Code/i });
   await expect(copyButton).toBeVisible({ timeout: 10000 });
   await copyButton.click();
+
+  // add the item
+  await page.getByRole('textbox', { name: 'Item Name' }).fill('Milk');
+  await page.getByRole('textbox', { name: 'Quantity' }).fill('2 Liters');
+  await page.getByRole('button', { name: 'Add to List' }).click();
 
   // Logout
   await page.getByRole('button', { name: 'test Logout' }).click();
