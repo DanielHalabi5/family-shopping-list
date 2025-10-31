@@ -115,8 +115,8 @@ const App = () => {
       setTimeout(() => {
         setSuccessMsg('');
       }, 5000);
-    } catch (err: unknown) {
-      if (err.response?.data?.error?.includes('already') || err.response?.status === 409) {
+    } catch (err: any) {
+      if (err?.response?.data?.error?.includes('already') || err?.response?.status === 409) {
         setErrorMsg('You have already sent a join request to this family');
       } else {
         setErrorMsg('Failed to send join request');
@@ -143,7 +143,7 @@ const App = () => {
 
   async function handleCreate(taskData: { name: string; quantity: string; listId: string }) {
     try {
-      await createItem(token!, taskData);
+      await createItem(token!, { ...taskData, purchased: false });
       await getCurrentList();
     } catch (err) {
       console.error("Failed to create item", err);
@@ -276,15 +276,14 @@ const App = () => {
 
       {currentPage === 'dashboard' && (
         <Dashboard
-          errorMsg={errorMsg}
-          successMsg={successMsg}
           user={user}
           families={families}
           currentList={currentList}
           handleCreate={handleCreate}
           handleUpdate={handleUpdate}
           handleDelete={handleDelete}
-          getCurrentList={getCurrentList}
+          errorMsg={errorMsg}
+          successMsg={successMsg}
         />
       )}
 

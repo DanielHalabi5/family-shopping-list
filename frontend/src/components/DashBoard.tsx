@@ -13,7 +13,7 @@ type Props = {
     successMsg: string;
 }
 
-const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, handleDelete, errorMsg, successMsg }: Props) => {
+const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, handleDelete }: Props) => {
     const [newItemName, setNewItemName] = useState('');
     const [newItemQuantity, setNewItemQuantity] = useState('');
 
@@ -93,13 +93,13 @@ const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, ha
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {userFamily.members && Array.isArray(userFamily.members) ? (
-                                            userFamily.members.map((member) => (
+                                            userFamily.members.map((memberId) => (
                                                 <span
-                                                    key={member.id}
+                                                    key={memberId}
                                                     className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-white border border-gray-200"
                                                 >
-                                                    {member.name || `Member ${member.id}`}
-                                                    {member.id === userFamily.ownerId && ' (Admin)'}
+                                                    Member {memberId}
+                                                    {memberId === userFamily.ownerId && ' (Admin)'}
                                                 </span>
                                             ))
                                         ) : (
