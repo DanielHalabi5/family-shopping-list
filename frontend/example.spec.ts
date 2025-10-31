@@ -5,7 +5,7 @@ test('full app flow: login, create/join family, and add items', async ({ page })
   await page.goto('http://localhost:5173/');
   await page.getByRole('textbox', { name: 'Email' }).fill('test@test.com');
   await page.getByRole('textbox', { name: 'Password' }).fill('testpass');
-  await page.getByRole('button', { name: 'Login' }).click();
+  await page.locator('form').getByRole('button', { name: 'Login' }).click();
 
   // Create item
   await page.getByRole('textbox', { name: 'Item Name' }).fill('Milk');
@@ -15,7 +15,7 @@ test('full app flow: login, create/join family, and add items', async ({ page })
   // Copy family code
   page.once('dialog', dialog => {
     console.log('Dialog message:', dialog.message());
-    dialog.dismiss().catch(() => {});
+    dialog.dismiss().catch(() => { });
   });
   await page.getByRole('button', { name: 'Copy Family Code' }).click();
 
@@ -25,7 +25,7 @@ test('full app flow: login, create/join family, and add items', async ({ page })
   // Login as second user
   await page.getByRole('textbox', { name: 'Email' }).fill('test2@test2.com');
   await page.getByRole('textbox', { name: 'Password' }).fill('test2pass');
-  await page.getByRole('button', { name: 'Login' }).click();
+  await page.locator('form').getByRole('button', { name: 'Login' }).click();
 
   // Join family using code (replace with your code if needed)
   await page.getByRole('button', { name: 'Join Family' }).click();
@@ -46,7 +46,7 @@ test('full app flow: login, create/join family, and add items', async ({ page })
   // Login as second user again to verify access
   await page.getByRole('textbox', { name: 'Email' }).fill('test2@test2.com');
   await page.getByRole('textbox', { name: 'Password' }).fill('test2pass');
-  await page.getByRole('button', { name: 'Login' }).click();
+  await page.locator('form').getByRole('button', { name: 'Login' }).click();
 
   // Check or add new item
   await page.getByRole('textbox', { name: 'Item Name' }).fill('Salt');
