@@ -1,5 +1,5 @@
 import { FaCopy, FaPlus, FaTrash, FaUsers } from 'react-icons/fa';
-import type { Family, List, ShoppingItem, User } from '../types';
+import type { Family, FamilyMember, List, ShoppingItem, User } from '../types';
 import { useState } from 'react';
 
 type Props = {
@@ -93,7 +93,7 @@ const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, ha
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {userFamily.members && Array.isArray(userFamily.members) ? (
-                                            userFamily.members.map((member) => (
+                                            userFamily.members.map((member: FamilyMember) => (
                                                 <span
                                                     key={member.id}
                                                     className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-white border border-gray-200"
