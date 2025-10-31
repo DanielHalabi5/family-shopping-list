@@ -7,9 +7,9 @@ test('full app flow: login, create/join family, and add items', async ({ page })
   await page.getByRole('textbox', { name: 'Password' }).fill('testpass');
   await page.locator('form').getByRole('button', { name: 'Login' }).click();
 
-page.once('dialog', dialog => {
+  page.once('dialog', dialog => {
     console.log(`Dialog message: ${dialog.message()}`);
-    dialog.dismiss().catch(() => {});
+    dialog.dismiss().catch(() => { });
   });
   await page.getByRole('button', { name: 'Copy Family Code' }).click()
 
@@ -29,7 +29,9 @@ page.once('dialog', dialog => {
   // Join family using code (replace with your code if needed)
   await page.getByRole('button', { name: 'Join Family' }).click();
   await page.getByRole('textbox', { name: 'Family Code' }).fill('cmhbylaoo0002venkxd3g75ui');
-  await page.getByRole('button', { name: 'Request to Join' }).click();
+  const joinButton = page.getByRole('button', { name: 'Request to Join' });
+  await joinButton.waitFor({ state: 'visible', timeout: 10000 });
+  await joinButton.click();
 
   // Logout again
   await page.getByRole('button', { name: 'test2 Logout' }).click();
