@@ -31,14 +31,13 @@ test('full app flow: login, create/join family, and add items', async ({ page })
   // await page.getByRole('textbox', { name: 'Family Code' }).fill('cmhbylaoo0002venkxd3g75ui');
   //   await page.locator('form').getByRole('button', { name: 'Request to Join' }).click();
 
-
   // Logout again
   await page.getByRole('button', { name: 'test2 Logout' }).click();
 
   // Login back as admin to approve
   await page.getByRole('textbox', { name: 'Email' }).fill('test@test.com');
   await page.getByRole('textbox', { name: 'Password' }).fill('testpass');
-  await page.getByRole('button', { name: 'Login' }).click();
+  await page.locator('form').getByRole('button', { name: 'Login' }).click();
   await page.getByRole('button', { name: 'Join Requests' }).click();
   await page.getByRole('button', { name: 'Approve' }).click();
   await page.getByRole('button', { name: 'test Logout' }).click();
