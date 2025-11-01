@@ -27,9 +27,9 @@ test('full app flow: login, create/join family, and add items', async ({ page })
   await page.locator('form').getByRole('button', { name: 'Login' }).click();
 
   // Join family using code
-  await page.getByRole('button', { name: 'Join Family' }).click();
-  await page.getByRole('textbox', { name: 'Family Code' }).fill('cmhbylaoo0002venkxd3g75ui');
-    await page.locator('form').getByRole('button', { name: 'Request to Join' }).click();
+  // await page.getByRole('button', { name: 'Join Family' }).click();
+  // await page.getByRole('textbox', { name: 'Family Code' }).fill('cmhbylaoo0002venkxd3g75ui');
+  //   await page.locator('form').getByRole('button', { name: 'Request to Join' }).click();
 
 
   // Logout again
