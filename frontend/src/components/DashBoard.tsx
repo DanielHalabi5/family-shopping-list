@@ -1,5 +1,5 @@
 import { FaCopy, FaPlus, FaTrash, FaUsers } from 'react-icons/fa';
-import type { Family, List, ShoppingItem, User } from '../types';
+import type { Family, FamilyMember, List, ShoppingItem, User } from '../types';
 import { useState } from 'react';
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
     successMsg: string;
 }
 
-const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, handleDelete }: Props) => {
+const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, handleDelete}: Props) => {
     const [newItemName, setNewItemName] = useState('');
     const [newItemQuantity, setNewItemQuantity] = useState('');
 
@@ -93,13 +93,13 @@ const Dashboard = ({ user, families, currentList, handleCreate, handleUpdate, ha
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {userFamily.members && Array.isArray(userFamily.members) ? (
-                                            userFamily.members.map((memberId) => (
+                                            userFamily.members.map((member: FamilyMember) => (
                                                 <span
-                                                    key={memberId}
+                                                    key={member.id}
                                                     className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-white border border-gray-200"
                                                 >
-                                                    Member {memberId}
-                                                    {memberId === userFamily.ownerId && ' (Admin)'}
+                                                    {member.name || `Member ${member.id}`}
+                                                    {member.id === userFamily.ownerId && ' (Admin)'}
                                                 </span>
                                             ))
                                         ) : (

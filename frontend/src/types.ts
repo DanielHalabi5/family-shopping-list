@@ -4,7 +4,7 @@ export type User = {
   name: string;
   password?: string;
   familyId?: string | null;
-    createdAt: string;
+  createdAt: string;
   updatedAt: string;
 };
 
@@ -12,9 +12,14 @@ export type Family = {
   id: string;
   name: string;
   ownerId: string;
-  members?: string[];
+  members?: FamilyMember[];
   createdAt: string;
   updatedAt: string;
+};
+
+export type FamilyMember = {
+  id: string;
+  name: string;
 };
 
 export type JoinRequest = {
